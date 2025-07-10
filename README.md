@@ -49,7 +49,7 @@ uvicorn app.main:app --reload
 docker-compose up --build
 ```
 
-### Testing
+## 🧪 Testing
 1. Run first the project and must be a database url, in our case we did it with sqlite
 ```bash
 uvicorn app.main:app --reload  
@@ -57,4 +57,6 @@ uvicorn app.main:app --reload
 2. In other terminal put the following command, since we have integration tests
 ```bash
 pytest app/tests/ --asyncio-mode=auto --cov=app --cov-report=term-missing
-```s
+```
+
+**Happy Coding!** 🎉
