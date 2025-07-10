@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Body
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from passlib.context import CryptContext
@@ -10,6 +10,7 @@ from app.auth import schemas
 from dotenv import load_dotenv
 import os
 from datetime import UTC
+from typing import Annotated
 
 load_dotenv()
 
@@ -36,7 +37,18 @@ def create_access_token(data: dict, expires_delta: timedelta = None):
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
 @router.post("/register", response_model=schemas.UserOut)
-async def register(user: schemas.UserCreate, db: AsyncSession = Depends(get_db)):
+async def register(user: Annotated[
+        schemas.UserCreate,
+        Body(
+            examples=[
+                {
+                    "username": "Foo",
+                    "email": "a@a.co",
+                    "password": "supersecretpassword"
+                }
+            ],
+        ),
+    ], db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(models.User).where(models.User.email == user.email))
     if result.scalars().first():
         raise HTTPException(status_code=400, detail="Email already registered")
@@ -52,7 +64,17 @@ async def register(user: schemas.UserCreate, db: AsyncSession = Depends(get_db))
     return db_user
 
 @router.post("/login", response_model=schemas.Token)
-async def login(user: schemas.UserLogin, db: AsyncSession = Depends(get_db)):
+async def login(user: Annotated[
+        schemas.UserLogin,
+        Body(
+            examples=[
+                {
+                    "email": "a@a.co",
+                    "password": "supersecretpassword"
+                }
+            ],
+        ),
+    ], db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(models.User).where(models.User.email == user.email))
     db_user = result.scalars().first()
     if not db_user or not verify_password(user.password, db_user.hashed_password):
