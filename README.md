@@ -36,6 +36,10 @@ pip install -r requirements.txt
 uvicorn app.main:app --reload  
 ```
 3. Documentation with swagger in url  `http://localhost:8000/docs`
+4. Websocket in url with postman `ws://localhost:8000/ws/leaderboard`
+
+An example how would be
+![alt text](websocket.png "Title")
 
 
 ### Steps with container
